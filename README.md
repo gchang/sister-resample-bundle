@@ -43,7 +43,7 @@ No GDAL is needed for this step. The PGE needs no network.
   ```
 - Official output to compare with, from the same place: `EXPERIMENTAL-SISTER_AVCL_L2A_RSRFL_20110513T175417_004{.bin,.hdr}`.
 
-The example scene (AVIRIS-Classic `f110513t01p00r03`, Grand Mesa, Colorado, 2011-05-13; 83 by 722 pixels, 224 bands) takes a few seconds and about 0.25 GB of memory.
+The example scene (AVIRIS-Classic `f110513t01p00r03`, Grand Mesa, Colorado, 2011-05-13; 83 by 722 pixels, 224 bands) takes under a minute (most of it Python start-up) and about 0.3 GB of memory.
 
 ## Running one scene
 
@@ -61,7 +61,7 @@ mkdir work && cd work
 
 `--crid 004` gives the official V004 names (default `000`); `--experimental True` (the default) adds the `EXPERIMENTAL-` prefix.
 
-The products land in `output/EXPERIMENTAL-SISTER_AVCL_L2A_RSRFL_20110513T175417_004/`, with one subfolder for the resampled reflectance (`..._004/`, 211 bands) and one for its uncertainty (`..._004_UNC/`), each holding `.bin`, `.hdr`, STAC `.json` and, for the reflectance, a browse `.png`. The reflectance subfolder is the `--reflectance_dataset` input of the next step, `sister-reflect_correct` (bundle `sister-reflect-correct-bundle`).
+The products land in `output/EXPERIMENTAL-SISTER_AVCL_L2A_RSRFL_20110513T175417_004/`, a STAC catalog (`catalog.json`) with one subfolder for the resampled reflectance (`..._004/`, 211 bands) and one for its uncertainty (`..._004_UNC/`). Each holds the `.bin`, `.hdr`, STAC `.json` and an empty `.met.json`; the reflectance folder also holds the browse `.png`, the `.runconfig.json` and the `.log`. The reflectance subfolder is the `--reflectance_dataset` input of the next step, `sister-reflect_correct` (bundle `sister-reflect-correct-bundle`).
 
 ## Known traps
 
@@ -70,3 +70,8 @@ The products land in `output/EXPERIMENTAL-SISTER_AVCL_L2A_RSRFL_20110513T175417_
 - **`/app` paths and `SISTER_APP_DIR`.** Not needed for this step. They matter only for the ISOFIT step, which hard-codes `/app/6s` and `/app/sRTMnet_v120.h5`.
 - **ISOFIT reruns.** If the reflectance input comes from your own ISOFIT run, make sure that run was not an interrupted job rerun in the same folder: ISOFIT then skips the inversion and writes wrong reflectance without an error.
 - **Reproducibility.** This step is deterministic. The next step, `sister-reflect_correct`, is not (its BRDF fit draws an unseeded random sample).
+
+## Checked
+
+Checked on 2026-10-25 from a fresh `git clone --recurse-submodules`, with the env built as above (Python 3.8.20, numpy 1.24.4, scipy 1.10.1, scikit-image 0.19.3, hy-tools 1.5.0), on the official V004 L2A RFL and UNC inputs, with no network: the resampled reflectance and uncertainty (`.bin` and `.hdr`) are byte-identical to the official `L2A_RSRFL` files (`cmp`; reflectance sha256 `66bc0fe288f3ad94caedd5c9eb7d4c5308fde0048d6bd089fb5a7a360dd2f478`). The run took 30 s and 0.3 GB.
+
