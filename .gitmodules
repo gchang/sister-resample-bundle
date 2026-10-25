@@ -1,0 +1,6 @@
+[submodule "sister-resample"]
+	path = sister-resample
+	url = https://github.com/sister-jpl/sister-resample.git
+[submodule "hytools"]
+	path = hytools
+	url = https://github.com/EnSpec/hytools.git
